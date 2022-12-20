@@ -1,0 +1,27 @@
+﻿@model CoverType
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Create CoverType</h2>
+            <hr />
+        </div>
+        <div asp-validation-summary="All"></div>
+        <div class="mb-3">
+            <!--asp-for เป็น tag helper ใช้สำหรับ bilding Name กับตัวแปรใน Model เลย-->
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control"/>
+            <!--asp-validation-for เป็น tag helper ใช้สำหรับแสดงข้อความ error ที่ส่งมาจาก serverside-->
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:150px">Create</button>
+        <a asp-asp-controller="CoverType" asp-action="Index" class="btn btn-secondary" style="width:150px;">Back</a>
+    </div>
+</form>
+
+@section Scripts{
+    @* validation Client side  ถ้า validation ไม่ผ่านจะไม่ส่งไปให้ server เลย *@
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
