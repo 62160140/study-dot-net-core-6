@@ -84,13 +84,13 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-        
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-      
+
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
@@ -121,16 +121,16 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
 
 
         public async Task OnGetAsync(string returnUrl = null)
-        {   
-            //ยังไม่มี Role ใน DB
-            if (!_roleManager.RoleExistsAsync(SD.Role_Admin).GetAwaiter().GetResult())
-            {
-                //เพิ่ม Role ใน DB
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Indi)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Comp)).GetAwaiter().GetResult();
-            }
+        {
+            ////ยังไม่มี Role ใน DB
+            //if (!_roleManager.RoleExistsAsync(SD.Role_Admin).GetAwaiter().GetResult())
+            //{
+            //    //เพิ่ม Role ใน DB
+            //    _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
+            //    _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
+            //    _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Indi)).GetAwaiter().GetResult();
+            //    _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Comp)).GetAwaiter().GetResult();
+            //}
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             //สร้าง Role Dropdown , Company Dropdown
@@ -143,7 +143,7 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
                     Value = i
                 }),
                 //CompanyList
-                CompanyList = _unitOfWork.Companies.GetAll().Select(i=>new SelectListItem { Text = i.Name,Value = i.Id.ToString()})
+                CompanyList = _unitOfWork.Companies.GetAll().Select(i => new SelectListItem { Text = i.Name, Value = i.Id.ToString() })
             };
         }
 
@@ -157,16 +157,16 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 //เพิ่ม
-                user.StreetAddress= Input.StreetAddress;
-                user.City= Input.City;
-                user.State= Input.State;
+                user.StreetAddress = Input.StreetAddress;
+                user.City = Input.City;
+                user.State = Input.State;
                 user.PostalCode = Input.PostalCode;
-                user.Name= Input.Name;
-                user.PhoneNumber= Input.PhoneNumber;
+                user.Name = Input.Name;
+                user.PhoneNumber = Input.PhoneNumber;
                 //ถ้า user มี Role = Company
-                if(Input.Role == SD.Role_User_Comp)
+                if (Input.Role == SD.Role_User_Comp)
                 {
-                    user.CompanyId= Input.CompanyId;        
+                    user.CompanyId = Input.CompanyId;
                 }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -205,8 +205,17 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        if (User.IsInRole(SD.Role_Admin))
+                        {
+                            TempData["success"] = "New User Created Successfully";
+                        }
+                        else
+                        {
+                            //Login อัตโนมัติ
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                        }
                         return LocalRedirect(returnUrl);
+
                     }
                 }
                 foreach (var error in result.Errors)

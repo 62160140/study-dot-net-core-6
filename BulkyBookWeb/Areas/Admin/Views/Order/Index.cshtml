@@ -1,0 +1,156 @@
+﻿@{
+    //Get Data from params
+    var statusParam = Context.Request.Query["status"];
+    var pending = "text-primary";
+    var inprocess = "text-primary";
+    var completed = "text-primary";
+    var approved = "text-primary";
+    var all = "text-primary";
+
+    switch (statusParam)
+    {
+        case "pending":
+            pending = "active text-white";
+            break;
+        case "inprocess":
+            inprocess = "active text-white";
+            break;
+        case "completed":
+            completed = "active text-white";
+            break;
+        case "approved":
+            approved = "active text-white";
+            break;
+        default:
+            all = "active text-white";
+            break;
+
+    };
+}
+
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-4">
+            <h2 class="text-primary">Order List</h2>
+        </div>
+        <div class="col-8">
+            <ul class="list-group list-group-horizontal-sm d-flex justify-content-end" style="margin-left:auto">
+                <!--ยิงเข้าหาหน้าตัวเอง (หน้านี้นี้แหล่ะเปลื่ยนแค่ param)-->
+                <a style="text-decoration:none" asp-action="Index" asp-route-status="inprocess">
+                <li class="list-group-item @inprocess">
+                    In Process
+                </li>
+                </a>
+                <a style="text-decoration:none" asp-action="Index" asp-route-status="pending">
+                <li class="list-group-item @pending">
+                    Pending
+                </li>
+                </a>
+                <a style="text-decoration:none" asp-action="Index" asp-route-status="completed">
+                <li class="list-group-item @completed">
+                    Completed
+                </li>
+                </a>
+                <a style="text-decoration:none" asp-action="Index" asp-route-status="approved">
+                <li class="list-group-item @approved">
+                    Approved
+                </li>
+                </a>
+                <a style="text-decoration:none" asp-action="Index" asp-route-status="all">
+                <li class="list-group-item @all">
+                    All
+                </li>
+                </a>
+            </ul>
+        </div>
+    </div>
+    <br />
+    <table class="table table-bordered table-striped" style="width:100%" id="tblDataOrder">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    PhoneNumber
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    Operation
+                </th>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+
+@section Scripts{
+    <script>
+        var dataTable;
+        var statusObj = {
+            all: "all",
+            pending: "pending",
+            inprocess: "inprocess",
+            completed: "completed",
+            approved: "approved"
+        };
+
+        $(document).ready(function () {
+            //ดึง url มา
+            var url = window.location.search;
+            var statusFromFind = findStatus(url)
+            console.log(statusFromFind)
+
+            loadDataTable(statusFromFind)
+        });
+
+        function loadDataTable(statusFromFind) {
+
+            dataTable = $('#tblDataOrder').DataTable({
+                "ajax": {
+                    "url": "/Admin/Order/GetAll?status=" + statusFromFind
+                },
+                "columns": [
+                    { "data": "id", "width": "5%" },
+                    { "data": "name", "width": "15%" },
+                    { "data": "phoneNumber", "width": "15%" },
+                    { "data": "applicationUser.email", "width": "15%" },
+                    { "data": "orderStatus", "width": "15%" },
+                    { "data": "orderTotal", "width": "10%" },
+                    {
+                        "data": "id",
+                        "render": function (data) {
+                            return `
+                                    <div class="w-78 btn-group" role="group">
+                                        <a href="/Admin/Order/Details?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i>Details</a>
+                                    </div>
+                                                                                                                                        `
+                        },
+                        "width": "5%"
+                    },
+                ]
+            });
+
+        }
+
+        function findStatus(url) {
+            for (let key in statusObj) {
+                if (url.includes(statusObj[key])) {
+                    return statusObj[key];
+                }
+            }
+        }
+    </script>
+}

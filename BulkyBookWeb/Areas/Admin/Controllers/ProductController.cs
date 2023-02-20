@@ -3,6 +3,8 @@ using BulkyBook.DataAccess.Repository;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
+using BulkyBook.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
@@ -10,6 +12,8 @@ using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 namespace BulkyBookWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    //ต้องเป็น admin เท่านั้นจะเข้าถึง path /customer/cart/... ได้
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
 

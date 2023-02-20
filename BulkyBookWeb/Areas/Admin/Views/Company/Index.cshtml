@@ -85,7 +85,7 @@
                         .then(function (data) {
                             // Do something with the response
                             if (data.success) {
-                                dataTable.ajax.reload();
+                                w
                                 toastr.success(data.message)
                             } else {
                                 toastr.error(data.message)
